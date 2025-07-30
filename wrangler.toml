@@ -1,0 +1,30 @@
+# Cloudflare Workers configuration for Next.js WordPress Blog
+main = ".open-next/worker.js"
+name = "nextjs-wp-blog"
+compatibility_date = "2025-01-26"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[vars]
+NODE_ENV = "production"
+WORDPRESS_API_URL = "https://demo.wp-api.org/wp-json/wp/v2"
+SITE_NAME = "Amazing Stories"
+SITE_DESCRIPTION = "Modern WordPress blog built with Next.js"
+
+# Production environment
+[env.production]
+name = "nextjs-wp-blog-prod"
+vars = { NODE_ENV = "production" }
+
+# Staging environment  
+[env.staging]
+name = "nextjs-wp-blog-staging"
+vars = { NODE_ENV = "staging" }
+
+# Development environment
+[env.development]
+name = "nextjs-wp-blog-dev"
+vars = { NODE_ENV = "development" }
