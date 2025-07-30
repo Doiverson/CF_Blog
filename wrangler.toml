@@ -3,7 +3,6 @@ main = ".open-next/worker.js"
 name = "nextjs-wp-blog"
 compatibility_date = "2025-01-26"
 compatibility_flags = ["nodejs_compat"]
-account_id = "023e7205d5443e8d0c48e1c0409e3337"
 
 [assets]
 directory = ".open-next/assets"
@@ -29,3 +28,8 @@ vars = { NODE_ENV = "staging" }
 [env.development]
 name = "nextjs-wp-blog-dev"
 vars = { NODE_ENV = "development" }
+
+# Preview environment for PRs
+[env.preview]
+name = "nextjs-wp-blog-preview"
+vars = { NODE_ENV = "preview" }
