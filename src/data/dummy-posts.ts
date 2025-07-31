@@ -51,7 +51,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
     template: '',
     format: 'standard',
     meta: { footnotes: '' },
-    categories: [1],
+    categories: [1, 5],
     tags: [3, 4, 2],
     class_list: ['post-1', 'post', 'type-post', 'status-publish', 'format-standard', 'hentry', 'category-frontend'],
     _links: {
@@ -149,7 +149,7 @@ type EventHandler&lt;T extends keyof EventMap&gt; = (data: EventMap[T]) =&gt; vo
     template: '',
     format: 'standard',
     meta: { footnotes: '' },
-    categories: [1, 7],
+    categories: [2, 3],
     tags: [2, 1, 3],
     class_list: ['post-2', 'post', 'type-post', 'status-publish', 'format-standard', 'sticky', 'hentry'],
     _links: {
@@ -264,7 +264,7 @@ export default function InteractiveButton() {
     template: '',
     format: 'standard',
     meta: { footnotes: '' },
-    categories: [1],
+    categories: [4, 6],
     tags: [3, 4, 17],
     class_list: ['post-3', 'post', 'type-post', 'status-publish', 'format-standard', 'hentry'],
     _links: {

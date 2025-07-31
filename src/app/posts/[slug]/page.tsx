@@ -9,7 +9,8 @@ import { TableOfContents } from '@/components/TableOfContents'
 import { PostActions } from '@/components/PostActions'
 import { RelatedPosts } from '@/components/RelatedPosts'
 import { CommentSection } from '@/components/CommentSection'
-import type { BlogPost, Tag as TagType } from '@/types'
+import { Header } from '@/components/Header'
+import type { BlogPost, Tag as TagType, Category } from '@/types'
 
 interface PostPageProps {
   params: Promise<{
@@ -85,6 +86,118 @@ export async function generateMetadata(
   }
 }
 
+// Dummy categories for header
+const dummyCategories: Category[] = [
+  { 
+    id: 1, 
+    name: 'Web開発', 
+    slug: 'web-development', 
+    count: 15, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/1' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=1' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  },
+  { 
+    id: 2, 
+    name: 'JavaScript', 
+    slug: 'javascript', 
+    count: 12, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/2' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=2' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  },
+  { 
+    id: 3, 
+    name: 'TypeScript', 
+    slug: 'typescript', 
+    count: 8, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/3' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=3' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  },
+  { 
+    id: 4, 
+    name: 'React', 
+    slug: 'react', 
+    count: 10, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/4' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=4' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  },
+  { 
+    id: 5, 
+    name: 'Next.js', 
+    slug: 'nextjs', 
+    count: 6, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/5' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=5' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  },
+  { 
+    id: 6, 
+    name: 'UI/UX', 
+    slug: 'ui-ux', 
+    count: 7, 
+    description: '', 
+    link: '', 
+    taxonomy: 'category', 
+    parent: 0, 
+    meta: [], 
+    _links: {
+      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/6' }],
+      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
+      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
+      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=6' }],
+      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
+    }
+  }
+]
+
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
 
@@ -106,6 +219,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <Header categories={dummyCategories} />
         {/* Container */}
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumbs */}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { SortSelector } from '@/components/SortSelector';
 import type { Category } from '@/types';
@@ -7,13 +8,19 @@ import type { SortOption } from '@/components/SortSelector';
 
 interface BlogSidebarProps {
   categories: Category[]
+  selectedCategories?: number[]
+  onCategoryChange?: (categoryIds: number[]) => void
 }
 
-export function BlogSidebar({ categories }: BlogSidebarProps) {
-  const handleCategoryChange = (categoryIds: number[]) => {
-    // This would normally update URL params
+export function BlogSidebar({ categories, selectedCategories: propSelectedCategories, onCategoryChange: propOnCategoryChange }: BlogSidebarProps) {
+  const [localSelectedCategories, setLocalSelectedCategories] = useState<number[]>([]);
+  
+  // Use prop values if provided, otherwise use local state
+  const selectedCategories = propSelectedCategories !== undefined ? propSelectedCategories : localSelectedCategories;
+  const handleCategoryChange = propOnCategoryChange || ((categoryIds: number[]) => {
+    setLocalSelectedCategories(categoryIds);
     console.log('Selected categories:', categoryIds);
-  };
+  });
 
   const handleSortChange = (sort: SortOption) => {
     // This would normally update URL params
@@ -29,7 +36,7 @@ export function BlogSidebar({ categories }: BlogSidebarProps) {
           <div>
             <CategoryFilter
               categories={categories}
-              selectedCategories={[]}
+              selectedCategories={selectedCategories}
               onCategoryChange={handleCategoryChange}
             />
           </div>
