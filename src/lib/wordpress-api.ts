@@ -1,5 +1,6 @@
 import type { BlogPost, BlogPostsResponse, PaginationParams, WordPressApiError, Tag } from '@/types'
-import { getDummyPostsPage, getDummyPostBySlug, getDummyTags, getDummyTagById, getDummyTagsByIds, getDummyTagBySlug } from './dummy-data'
+import { getDummyPostBySlug, getDummyTags, getDummyTagById, getDummyTagsByIds, getDummyTagBySlug } from './dummy-data'
+import { dummyPosts } from '@/data/dummy-posts'
 
 export class WordPressApi {
   private baseUrl: string
@@ -42,7 +43,16 @@ export class WordPressApi {
     } catch (error) {
       if (this.useFallback) {
         console.warn('WordPress API unavailable, falling back to dummy data:', error)
-        return getDummyPostsPage(page, perPage)
+        // Simplified fallback: return the dummy posts array without pagination logic
+        return {
+          posts: dummyPosts,
+          total: dummyPosts.length,
+          totalPages: 1,
+          currentPage: 1,
+          perPage: dummyPosts.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        }
       }
       
       if (error instanceof Error) {
@@ -212,7 +222,7 @@ export class WordPressApi {
         }
 
         // Filter dummy posts by tag ID
-        const allPosts = getDummyPostsPage(1, 100).posts
+        const allPosts = dummyPosts
         const filteredPosts = allPosts.filter(post => post.tags.includes(tag.id))
         
         // Apply pagination

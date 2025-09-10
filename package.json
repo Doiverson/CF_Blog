@@ -16,7 +16,8 @@
     "test:coverage": "vitest --coverage",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare deploy",
+    "cf:deploy": "opennextjs-cloudflare deploy --env production",
+    "cf:deploy:dev": "opennextjs-cloudflare deploy --env development",
     "clean": "rm -rf .next out dist",
     "prepare": "husky install || true"
   },

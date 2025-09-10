@@ -203,6 +203,8 @@ export default async function Home({ searchParams }: HomeProps) {
       })
     }
 
+    console.log('filteredPosts', filteredPosts)
+
     // Create filtered blog data
     const filteredBlogData = {
       ...blogData,
