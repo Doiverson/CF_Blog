@@ -2,16 +2,12 @@ import { WordPressApi } from '@/lib/wordpress-api'
 import { BlogListContainer } from '@/components/BlogListContainer'
 import { BlogControlsSection } from '@/components/BlogControlsSection'
 import { Header } from '@/components/Header'
-import type { Tag, Category } from '@/types'
+import type { Tag } from '@/types'
+import { dummyCategories } from '@/data/dummy-categories'
+import { parseSearchParams } from '@/lib/search-params'
 
 interface HomeProps {
-  searchParams?: Promise<{
-    page?: string
-    search?: string
-    category?: string
-    categories?: string
-    sort?: string
-  }>
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
 }
 
 async function fetchBlogPosts(page: number = 1) {
@@ -184,140 +180,27 @@ function ErrorState() {
   )
 }
 
-// Dummy categories for demo
-const dummyCategories: Category[] = [
-  {
-    id: 1,
-    name: 'Web開発',
-    slug: 'web-development',
-    count: 15,
-    description: 'Web開発に関する記事',
-    link: 'https://example.com/category/web-development',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/1' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=1' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-  {
-    id: 2,
-    name: 'JavaScript',
-    slug: 'javascript',
-    count: 12,
-    description: 'JavaScript技術に関する記事',
-    link: 'https://example.com/category/javascript',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/2' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=2' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-  {
-    id: 3,
-    name: 'TypeScript',
-    slug: 'typescript',
-    count: 8,
-    description: 'TypeScriptに関する記事',
-    link: 'https://example.com/category/typescript',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/3' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=3' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-  {
-    id: 4,
-    name: 'React',
-    slug: 'react',
-    count: 10,
-    description: 'Reactに関する記事',
-    link: 'https://example.com/category/react',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/4' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=4' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-  {
-    id: 5,
-    name: 'Next.js',
-    slug: 'nextjs',
-    count: 6,
-    description: 'Next.jsに関する記事',
-    link: 'https://example.com/category/nextjs',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/5' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=5' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-  {
-    id: 6,
-    name: 'UI/UX',
-    slug: 'ui-ux',
-    count: 7,
-    description: 'UI/UXデザインに関する記事',
-    link: 'https://example.com/category/ui-ux',
-    taxonomy: 'category',
-    parent: 0,
-    meta: [],
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/6' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=6' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }],
-    },
-  },
-]
-
 export default async function Home({ searchParams }: HomeProps) {
   const resolvedSearchParams = (await searchParams) || {}
-  const currentPage = Number(resolvedSearchParams.page) || 1
-
-  // Parse categories from URL parameters
-  const selectedCategoryIds = resolvedSearchParams.categories
-    ? resolvedSearchParams.categories
-        .split(',')
-        .map((id: string) => parseInt(id, 10))
-        .filter((id: number) => !isNaN(id))
-    : []
+  const state = parseSearchParams(
+    new URLSearchParams(resolvedSearchParams as Record<string, string>)
+  )
+  const currentPage = state.page
 
   try {
     const blogData = await fetchBlogPosts(currentPage)
     const postTags = await fetchPostTags(blogData.posts)
 
+    console.log('state.categories', state.categories)
+
     // Filter posts server-side if categories are selected
     let filteredPosts = blogData.posts
-    if (selectedCategoryIds.length > 0) {
-      filteredPosts = blogData.posts.filter((post) =>
-        post.categories.some((categoryId) => selectedCategoryIds.includes(categoryId))
-      )
+    if (state.categories.length > 0) {
+      filteredPosts = blogData.posts.filter((post) => {
+        console.log('post.categories', post.categories)
+        console.log('state.categories', state.categories)
+        return post.categories.some((categoryId) => state.categories.includes(categoryId))
+      })
     }
 
     // Create filtered blog data

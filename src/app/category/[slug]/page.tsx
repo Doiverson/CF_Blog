@@ -3,7 +3,8 @@ import { BlogListContainer } from '@/components/BlogListContainer'
 import { BlogControlsSection } from '@/components/BlogControlsSection'
 import { Header } from '@/components/Header'
 import Link from 'next/link'
-import type { Tag, Category } from '@/types'
+import type { Tag } from '@/types'
+import { dummyCategories } from '@/data/dummy-categories'
 
 interface CategoryPageProps {
   params: Promise<{
@@ -16,124 +17,14 @@ interface CategoryPageProps {
   }>
 }
 
-// Dummy categories for now
-const dummyCategories: Category[] = [
-  { 
-    id: 1, 
-    name: 'Web開発', 
-    slug: 'web-development', 
-    count: 15, 
-    description: 'Web開発に関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/1' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=1' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 2, 
-    name: 'JavaScript', 
-    slug: 'javascript', 
-    count: 12, 
-    description: 'JavaScript技術に関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/2' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=2' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 3, 
-    name: 'TypeScript', 
-    slug: 'typescript', 
-    count: 8, 
-    description: 'TypeScriptに関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/3' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=3' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 4, 
-    name: 'React', 
-    slug: 'react', 
-    count: 10, 
-    description: 'Reactに関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/4' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=4' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 5, 
-    name: 'Next.js', 
-    slug: 'nextjs', 
-    count: 6, 
-    description: 'Next.jsに関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/5' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=5' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 6, 
-    name: 'UI/UX', 
-    slug: 'ui-ux', 
-    count: 7, 
-    description: 'UI/UXデザインに関する記事', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/6' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=6' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  }
-]
-
 async function fetchCategoryPosts(categorySlug: string, page: number = 1) {
   try {
-    const api = new WordPressApi(process.env.WORDPRESS_API_URL || 'https://demo.wp-api.org/wp-json/wp/v2')
-    
+    const api = new WordPressApi(
+      process.env.WORDPRESS_API_URL || 'https://demo.wp-api.org/wp-json/wp/v2'
+    )
+
     // Find category by slug
-    const category = dummyCategories.find(cat => cat.slug === categorySlug)
+    const category = dummyCategories.find((cat) => cat.slug === categorySlug)
     if (!category) {
       throw new Error('Category not found')
     }
@@ -149,20 +40,24 @@ async function fetchCategoryPosts(categorySlug: string, page: number = 1) {
 
 async function fetchPostTags(posts: { id: number; tags: number[] }[]) {
   try {
-    const api = new WordPressApi(process.env.WORDPRESS_API_URL || 'https://demo.wp-api.org/wp-json/wp/v2')
-    
+    const api = new WordPressApi(
+      process.env.WORDPRESS_API_URL || 'https://demo.wp-api.org/wp-json/wp/v2'
+    )
+
     const allTagIds = [...new Set(posts.flatMap((post) => post.tags))]
-    
+
     if (allTagIds.length === 0) {
       return {}
     }
 
     const tags = await api.getTagsByIds(allTagIds)
     const tagMap = new Map(tags.map((tag) => [tag.id, tag]))
-    
+
     const postTags: Record<number, Tag[]> = {}
     posts.forEach((post) => {
-      postTags[post.id] = post.tags.map((tagId: number) => tagMap.get(tagId)).filter((tag): tag is Tag => Boolean(tag))
+      postTags[post.id] = post.tags
+        .map((tagId: number) => tagMap.get(tagId))
+        .filter((tag): tag is Tag => Boolean(tag))
     })
 
     return postTags
@@ -177,21 +72,19 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const currentPage = Number(resolvedSearchParams.page) || 1
   const { slug } = await params
 
-  const category = dummyCategories.find(cat => cat.slug === slug)
-  
+  const category = dummyCategories.find((cat) => cat.slug === slug)
+
   if (!category) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header categories={dummyCategories} />
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex min-h-[60vh] items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              カテゴリーが見つかりません
-            </h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="mb-4 text-2xl font-bold text-gray-900">カテゴリーが見つかりません</h1>
+            <p className="mb-6 text-gray-600">
               お探しのカテゴリーは存在しないか、削除された可能性があります。
             </p>
-            <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/" className="font-medium text-blue-600 hover:text-blue-700">
               ホームに戻る →
             </Link>
           </div>
@@ -207,36 +100,32 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     return (
       <div className="min-h-screen bg-white">
         <Header categories={dummyCategories} />
-        
+
         {/* Category Header */}
-        <div className="bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white">
+          <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               {/* Breadcrumb */}
-              <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
+              <nav className="mb-6 flex items-center gap-2 text-sm text-gray-600">
+                <Link href="/" className="transition-colors hover:text-blue-600">
                   ホーム
                 </Link>
                 <span className="text-gray-400">/</span>
-                <span className="text-gray-900 font-medium">カテゴリー</span>
+                <span className="font-medium text-gray-900">カテゴリー</span>
                 <span className="text-gray-400">/</span>
-                <span className="text-blue-600 font-medium">{category.name}</span>
+                <span className="font-medium text-blue-600">{category.name}</span>
               </nav>
 
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                {category.name}
-              </h1>
-              
+              <h1 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">{category.name}</h1>
+
               {category.description && (
-                <p className="text-lg text-gray-600 mb-6">
-                  {category.description}
-                </p>
+                <p className="mb-6 text-lg text-gray-600">{category.description}</p>
               )}
-              
+
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="h-5 w-5 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -270,14 +159,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     return (
       <div className="min-h-screen bg-gray-50">
         <Header categories={dummyCategories} />
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex min-h-[60vh] items-center justify-center">
           <div className="text-center">
-            <div className="w-20 h-20 mx-auto mb-6 text-red-400">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+            <div className="mx-auto mb-6 h-20 w-20 text-red-400">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -286,12 +171,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">エラーが発生しました</h2>
-            <p className="text-gray-600 mb-8">記事を読み込めませんでした。ページを再読み込みしてください。</p>
+            <h2 className="mb-3 text-2xl font-bold text-gray-900">エラーが発生しました</h2>
+            <p className="mb-8 text-gray-600">
+              記事を読み込めませんでした。ページを再読み込みしてください。
+            </p>
             <form action="" method="get">
               <button
                 type="submit"
-                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
               >
                 再読み込み
               </button>

@@ -1,7 +1,12 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { WordPressApi } from '@/lib/wordpress-api'
-import { formatPostDate, calculateReadingTime, stripHtmlTags, generateTagHref } from '@/lib/data-utils'
+import {
+  formatPostDate,
+  calculateReadingTime,
+  stripHtmlTags,
+  generateTagHref,
+} from '@/lib/data-utils'
 import { HTMLContent } from '@/components/HTMLContent'
 import { Tag } from '@/components/Tag'
 import { Breadcrumbs, generatePostBreadcrumbs } from '@/components/Breadcrumbs'
@@ -10,7 +15,8 @@ import { PostActions } from '@/components/PostActions'
 import { RelatedPosts } from '@/components/RelatedPosts'
 import { CommentSection } from '@/components/CommentSection'
 import { Header } from '@/components/Header'
-import type { BlogPost, Tag as TagType, Category } from '@/types'
+import type { BlogPost, Tag as TagType } from '@/types'
+import { dummyCategories } from '@/data/dummy-categories'
 
 interface PostPageProps {
   params: Promise<{
@@ -35,7 +41,7 @@ async function fetchPostTags(post: BlogPost): Promise<TagType[]> {
     if (post.tags.length === 0) {
       return []
     }
-    
+
     const api = new WordPressApi(
       process.env.WORDPRESS_API_URL || 'https://demo.wp-api.org/wp-json/wp/v2'
     )
@@ -46,17 +52,16 @@ async function fetchPostTags(post: BlogPost): Promise<TagType[]> {
   }
 }
 
-export async function generateMetadata(
-  { params }: PostPageProps
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   try {
     const { slug } = await params
     const post = await fetchPost(slug)
-    
+
     const title = post.title.rendered
-    const description = stripHtmlTags(post.excerpt.rendered) || 
+    const description =
+      stripHtmlTags(post.excerpt.rendered) ||
       stripHtmlTags(post.content.rendered).slice(0, 160) + '...'
-    
+
     return {
       title: `${title} | Next.js WordPress Blog`,
       description,
@@ -86,130 +91,18 @@ export async function generateMetadata(
   }
 }
 
-// Dummy categories for header
-const dummyCategories: Category[] = [
-  { 
-    id: 1, 
-    name: 'Web開発', 
-    slug: 'web-development', 
-    count: 15, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/1' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=1' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 2, 
-    name: 'JavaScript', 
-    slug: 'javascript', 
-    count: 12, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/2' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=2' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 3, 
-    name: 'TypeScript', 
-    slug: 'typescript', 
-    count: 8, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/3' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=3' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 4, 
-    name: 'React', 
-    slug: 'react', 
-    count: 10, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/4' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=4' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 5, 
-    name: 'Next.js', 
-    slug: 'nextjs', 
-    count: 6, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/5' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=5' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  },
-  { 
-    id: 6, 
-    name: 'UI/UX', 
-    slug: 'ui-ux', 
-    count: 7, 
-    description: '', 
-    link: '', 
-    taxonomy: 'category', 
-    parent: 0, 
-    meta: [], 
-    _links: {
-      self: [{ href: 'https://example.com/wp-json/wp/v2/categories/6' }],
-      collection: [{ href: 'https://example.com/wp-json/wp/v2/categories' }],
-      about: [{ href: 'https://example.com/wp-json/wp/v2/taxonomies/category' }],
-      'wp:post_type': [{ href: 'https://example.com/wp-json/wp/v2/posts?categories=6' }],
-      curies: [{ name: 'wp', href: 'https://api.w.org/{rel}', templated: true }]
-    }
-  }
-]
-
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
 
   try {
     const post = await fetchPost(slug)
     const tags = await fetchPostTags(post)
-    
+
     const formattedDate = formatPostDate(post.date)
     const readingTime = calculateReadingTime(post.content.rendered)
     const titleId = `post-title-${post.id}`
     const postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://localhost:3000'}/posts/${post.slug}`
-    
+
     // Generate breadcrumbs - using the first category if available
     const breadcrumbs = generatePostBreadcrumbs(
       post.title.rendered,
@@ -228,9 +121,9 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
 
           {/* Main Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-4">
             {/* Table of Contents - Desktop Sidebar */}
-            <aside className="hidden lg:block lg:col-span-1">
+            <aside className="hidden lg:col-span-1 lg:block">
               <div className="sticky top-8">
                 <TableOfContents content={post.content.rendered} />
               </div>
@@ -238,32 +131,52 @@ export default async function PostPage({ params }: PostPageProps) {
 
             {/* Main Article */}
             <main className="lg:col-span-3" role="main">
-              <article 
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+              <article
+                className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"
                 aria-labelledby={titleId}
               >
                 {/* Article Header */}
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 lg:p-12">
                   <header>
-                    <h1 
+                    <h1
                       id={titleId}
-                      className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-6 leading-tight"
+                      className="mb-6 text-3xl font-bold leading-tight text-gray-900 lg:text-4xl xl:text-5xl"
                     >
                       {post.title.rendered}
                     </h1>
-                    
+
                     {/* Meta Information */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+                    <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-gray-600">
                       <time dateTime={post.date} className="flex items-center gap-2 font-medium">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
                         {formattedDate}
                       </time>
                       <span className="text-gray-400">•</span>
                       <span className="flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                         {readingTime} min read
                       </span>
@@ -288,35 +201,41 @@ export default async function PostPage({ params }: PostPageProps) {
                 </div>
 
                 {/* Table of Contents - Mobile */}
-                <div className="lg:hidden p-6 border-b border-gray-100">
+                <div className="border-b border-gray-100 p-6 lg:hidden">
                   <TableOfContents content={post.content.rendered} />
                 </div>
 
                 {/* Article Content */}
                 <div className="p-6 lg:p-8">
                   <div className="prose prose-lg max-w-none">
-                    <HTMLContent 
+                    <HTMLContent
                       content={post.content.rendered}
-                      className="text-gray-800 leading-relaxed"
+                      className="leading-relaxed text-gray-800"
                     />
                   </div>
 
                   {/* Tags Section */}
                   {tags.length > 0 && (
-                    <div className="mt-12 pt-8 border-t border-gray-200">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    <div className="mt-12 border-t border-gray-200 pt-8">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                            />
                           </svg>
                           Tags:
                         </span>
                         {tags.map((tag) => (
-                          <Tag
-                            key={tag.id}
-                            tag={tag}
-                            href={generateTagHref(tag.slug)}
-                          />
+                          <Tag key={tag.id} tag={tag} href={generateTagHref(tag.slug)} />
                         ))}
                       </div>
                     </div>
@@ -334,10 +253,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
               {/* Comments Section */}
               <div className="mt-12">
-                <CommentSection
-                  postId={post.id}
-                  allowComments={true}
-                />
+                <CommentSection postId={post.id} allowComments={true} />
               </div>
             </main>
           </div>

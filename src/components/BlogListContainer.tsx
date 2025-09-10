@@ -1,11 +1,12 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BlogPostList } from './BlogPostList'
 import { Pagination } from './Pagination'
 import { BlogSidebar } from './BlogSidebar'
 import type { BlogPostsResponse, Tag, Category } from '@/types'
+import { parseSearchParams, buildSearchParams } from '@/lib/search-params'
 
 interface BlogListContainerProps {
   initialData: BlogPostsResponse
@@ -22,21 +23,11 @@ export function BlogListContainer({
 }: BlogListContainerProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [selectedCategories, setSelectedCategories] = useState<number[]>(() => {
-    // Initialize from URL on first render
-    const categoryParam = searchParams.get('categories')
-    if (categoryParam) {
-      return categoryParam
-        .split(',')
-        .map((id) => parseInt(id, 10))
-        .filter((id) => !isNaN(id))
-    }
-    return []
-  })
+  const currentState = useMemo(() => {
+    return parseSearchParams(new URLSearchParams(searchParams.toString()))
+  }, [searchParams])
 
-  console.log('selectedCategories', selectedCategories)
-  console.log('initialData.posts', initialData.posts)
-  console.log('post categories', initialData.posts.map(p => ({ id: p.id, categories: p.categories })))
+  const selectedCategories = currentState.categories
 
   // Filter posts based on selected categories
   const filteredPosts = useMemo(() => {
@@ -44,13 +35,12 @@ export function BlogListContainer({
       return initialData.posts
     }
 
-    const filtered = initialData.posts.filter((post) => {
-      const hasCategory = post.categories.some((categoryId) => selectedCategories.includes(categoryId))
-      console.log(`Post ${post.id} categories: ${post.categories}, hasCategory: ${hasCategory}`)
-      return hasCategory
-    })
-    
-    console.log('filteredPosts count:', filtered.length)
+    console.log('selectedCategories', selectedCategories)
+    console.log('initialData.posts', initialData.posts)
+
+    const filtered = initialData.posts.filter((post) =>
+      post.categories.some((categoryId) => selectedCategories.includes(categoryId))
+    )
     return filtered
   }, [initialData.posts, selectedCategories])
 
@@ -69,41 +59,28 @@ export function BlogListContainer({
     }
   }, [filteredPosts, currentPage])
 
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (page === 1) {
-      params.delete('page')
-    } else {
-      params.set('page', page.toString())
+  // Map post.id -> Category[] for displayed posts
+  const postCategoriesMap = useMemo(() => {
+    const idToCategory = new Map(categories.map((c) => [c.id, c]))
+    const mapping: Record<number, Category[]> = {}
+    for (const post of filteredPagination.posts) {
+      mapping[post.id] = post.categories
+        .map((id) => idToCategory.get(id))
+        .filter((c): c is Category => Boolean(c))
     }
+    return mapping
+  }, [categories, filteredPagination.posts])
 
-    const queryString = params.toString()
-    const newUrl = queryString ? `/?${queryString}` : '/'
-
-    router.push(newUrl, { scroll: false })
+  const handlePageChange = (page: number) => {
+    const nextQs = buildSearchParams({ ...currentState, page })
+    const newUrl = nextQs ? `/?${nextQs}` : '/'
+    router.replace(newUrl, { scroll: false })
   }
 
   const handleCategoryChange = (categoryIds: number[]) => {
-    setSelectedCategories(categoryIds)
-
-    // Update URL without navigation for immediate filter
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (categoryIds.length === 0) {
-      params.delete('categories')
-    } else {
-      params.set('categories', categoryIds.join(','))
-    }
-
-    // Reset to page 1 when filtering
-    params.delete('page')
-
-    const queryString = params.toString()
-    const newUrl = queryString ? `/?${queryString}` : '/'
-
-    // Use replace to avoid adding to history and prevent scroll
-    window.history.replaceState({}, '', newUrl)
+    const nextQs = buildSearchParams({ ...currentState, categories: categoryIds, page: 1 })
+    const newUrl = nextQs ? `/?${nextQs}` : '/'
+    router.replace(newUrl, { scroll: false })
   }
 
   return (
@@ -122,7 +99,11 @@ export function BlogListContainer({
           {/* Blog Posts - Flexible width */}
           <div className="flex-1">
             <div className="mb-20">
-              <BlogPostList posts={filteredPagination.posts} postTags={postTags || {}} />
+              <BlogPostList
+                posts={filteredPagination.posts}
+                postTags={postTags || {}}
+                postCategories={postCategoriesMap}
+              />
             </div>
           </div>
 
